@@ -1,27 +1,47 @@
-import React, { useState } from "react";
-import { Button, StyleSheet, TextInput, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Button, Modal, StyleSheet, TextInput, View } from "react-native";
 
 type Props = {
   onPressAddButton(enteredGoal: string): void;
+  onPressCancelButton(): void;
+  visible: boolean;
 };
 
-const GoalInput = ({ onPressAddButton }: Props): JSX.Element => {
+const GoalInput = ({
+  onPressAddButton,
+  onPressCancelButton,
+  visible,
+}: Props): JSX.Element => {
   const [enteredGoal, setEnteredGoal] = useState<string>("");
 
-  const goalInputHandler = (enteredText: string) => {
+  const goalInputHandler = useCallback((enteredText: string) => {
     setEnteredGoal(enteredText);
+  }, []);
+
+  const addGoalHandler = () => {
+    onPressAddButton(enteredGoal);
+    setEnteredGoal("");
   };
 
   return (
-    <View style={styles.inputContainer}>
-      <TextInput
-        placeholder="Course Goal"
-        style={styles.textInput}
-        onChangeText={goalInputHandler}
-        value={enteredGoal}
-      />
-      <Button title="ADD" onPress={onPressAddButton.bind(this, enteredGoal)} />
-    </View>
+    <Modal visible={visible} animationType="slide">
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Course Goal"
+          style={styles.textInput}
+          onChangeText={goalInputHandler}
+          value={enteredGoal}
+        />
+        <View style={styles.buttonContainer}>
+          <View style={styles.button}>
+            <Button title="ADD" onPress={addGoalHandler} />
+          </View>
+          <View style={styles.button}>
+            <Button title="CANCEL" color="red" onPress={onPressCancelButton} />
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 };
 
@@ -29,8 +49,8 @@ export default GoalInput;
 
 const styles = StyleSheet.create({
   inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
   textInput: {
@@ -38,5 +58,14 @@ const styles = StyleSheet.create({
     borderBottomColor: "black",
     borderBottomWidth: 1,
     padding: 10,
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "50%",
+  },
+  button: {
+    width: "40%",
   },
 });
